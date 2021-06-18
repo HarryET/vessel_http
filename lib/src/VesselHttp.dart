@@ -66,7 +66,7 @@ class VesselHttp {
 
         ResponseBuilder? res;
 
-        final requestData = Request(request, this);
+        final requestData = Request(request, meta, this);
         final shouldDecodeJson = request.headers["content-type"]?.first == "application/json";
         await requestData.finalise(shouldDecodeJson: shouldDecodeJson);
 

@@ -1,5 +1,28 @@
 part of vessel_http;
 
+class Params {
+
+  late final Map<String, String> _raw;
+
+  Params(Uri requested, List<String?> paramsLinked) {
+    this._raw = {};
+
+    for(var i = 0; i < requested.pathSegments.length; i++) {
+      final segment = requested.pathSegments[i];
+      if(paramsLinked[i] != null) {
+        final link = paramsLinked[i]!;
+        this._raw[link] = segment;
+      }
+    }
+  }
+
+  String getValueOrDefault(String key, String defaultValue) => this._raw[key] ??= defaultValue;
+  String? getValue(String key) => this[key];
+
+  String? operator [](String key) => this._raw[key];
+
+}
+
 class Request {
 
   late final HttpRequest _internalRequest;
@@ -8,9 +31,11 @@ class Request {
   late final String body;
 
   late final Map<String, String> headers;
+  late final Params params;
 
-  Request(this._internalRequest, VesselHttp server) {
+  Request(this._internalRequest, HandlerMetadata meta, VesselHttp server) {
     this.headers = {};
+    this.params = Params(this._internalRequest.requestedUri, meta.paramMap);
     this._internalRequest.headers.forEach((name, values) {
       this.headers[name] = values.first;
     });
