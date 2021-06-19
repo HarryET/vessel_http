@@ -34,3 +34,4 @@ test-*.dart
 **/doc/api/**
 old.*
 .idea/misc.xml
+/example/certs

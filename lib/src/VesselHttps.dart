@@ -3,7 +3,6 @@ part of vessel_http;
 class VesselHttps extends VesselHttp {
 
   final SecurityContext ssl;
-  late final HttpServer _internalHttpsServer;
   final int httpsPort;
 
   late final Stream<HttpRequest> _requests;
@@ -16,23 +15,30 @@ class VesselHttps extends VesselHttp {
 
   @override
   void listen() async {
-    this._internalHttpsServer = await HttpServer.bindSecure(this.listenAddress, this.httpsPort, this.ssl, backlog: this.backlog);
-    this._internalServer = await HttpServer.bind(this.listenAddress, this.port, backlog: this.backlog);
+    this._internalServer = await HttpServer.bindSecure(this.listenAddress, 80, this.ssl, backlog: this.backlog);
 
-    this._logger.info("Server online and listening @ https://${_prod ? "0.0.0.0" : "127.0.0.1"}:${this.port}");
+    this._logger.info("Server online and listening @ https://${_prod ? "0.0.0.0" : "127.0.0.1"}:${this.httpsPort}");
 
-    this._internalHttpsServer.listen((req) => this._requestController.add(req));
-    this._internalServer.listen((req) => this._requestController.add(req));
-
-    await for (final request in this._requests) {
-      this._logger.info("[${request.method.toUpperCase()}] ${request.requestedUri.toString()}");
-
-      final response = await this._handleRequest(request);
-      if(response != null) {
-        response.execute(request);
+    await for (final req in this._internalServer) {
+      print(req.requestedUri);
+      if(req.requestedUri.hasPort) {
+        if([this.httpsPort, this.port].contains(req.requestedUri.port)) {
+          this._requestController.add(req);
+        }
+      } else {
+        if([this.httpsPort, this.port].contains(80)) {
+          this._requestController.add(req);
+        }
       }
 
-      await request.response.close();
+      this._logger.info("[${req.method.toUpperCase()}] ${req.requestedUri.toString()}");
+
+      final response = await this._handleRequest(req);
+      if(response != null) {
+        response.execute(req);
+      }
+
+      await req.response.close();
     }
   }
 
