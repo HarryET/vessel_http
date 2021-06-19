@@ -7,7 +7,7 @@ class DemoHandler extends RequestHandler {
     return ResponseBuilder()
         ..statusCode(200)
         ..json({
-          "name": request.params.getValueOrDefault("name", "world")
+          "name": request.params.getValue("name")
         });
   }
 

@@ -10,6 +10,7 @@ import 'dart:io';
 import 'package:logging/logging.dart';
 
 part 'src/VesselHttp.dart';
+part 'src/VesselHttps.dart';
 part 'src/ResponseBuilder.dart';
 part 'src/RequestHandler.dart';
 part 'src/Request.dart';

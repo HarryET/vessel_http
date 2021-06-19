@@ -16,10 +16,9 @@ class Params {
     }
   }
 
-  String getValueOrDefault(String key, String defaultValue) => this._raw[key] ??= defaultValue;
-  String? getValue(String key) => this[key];
+  String getValue(String key) => this[key];
 
-  String? operator [](String key) => this._raw[key];
+  String operator [](String key) => this._raw[key]!;
 
 }
 
